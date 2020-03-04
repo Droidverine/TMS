@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta>
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {
+  width: 50%
+  box-sizing: border-box;}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  margin: auto;
+  padding: 12px 20px;
+
+  width: 50%;
+}
+</style>
+</head>
+<body>
+
+
+
+<div class="container">
+  
+</br>
+<div align="left">
+ 
+ <form action="\TaskBoard_Create" method="get">
+  <input type="text" name="TaskBoard_name" placeholder="Enter Task Name.....">
+  <input type="text" name="TaskBoard_members" placeholder="Inser initial member(only one).....">
+  <input type="submit"  class="button" value="CreateTask">
+
+
+</form>
+
+<ul>
+{%for i in result%}
+
+<li><a href="\AddTask?ViewTask=true&Task_boardname={{i.TaskBoard_name}}">Task Board : {{i.TaskBoard_name}}</a></br>
+{% for x in i.TaskBoard_members%}
+  <a>Members : {{x}}</a>
+{% endfor %}
+</li>
+{% endfor %}
+</ul>
+</div>
+<div align="right">
+  {% if user %}
+{% else %}
+{% endif %}
+<p>you can {{ url_string }} <a href='{{ url }}'>here</a></p>
+</div>
+</div>
+
+</body>
+</html>

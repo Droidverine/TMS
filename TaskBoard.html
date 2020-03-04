@@ -1,0 +1,15 @@
+<html>
+<body>
+	<form action="\AddTask" method="get">
+	<input type="text" name="Task_name" id="Task_name" placeholder="Enter task name........">	
+	<input type="hidden" id="Task_boardname" name="Task_boardname" value="{{Task_boardname}}">
+	<input type="submit" name="submit">
+	</form>
+	<h1>{{result.Task_boardname}}</h1>
+	<ul>
+	{% for i in result %}
+	<li><a>i.Task_name</a></li>
+	{% endfor %}
+</ul>
+</body>
+</html>
