@@ -49,7 +49,7 @@ input[type=submit] {
 <div align="left">
  
  <form action="\TaskBoard_Create" method="get">
-  <input type="text" name="TaskBoard_name" placeholder="Enter Task Name.....">
+  <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name.....">
   <input type="text" name="TaskBoard_members" placeholder="Inser initial member(only one).....">
   <input type="submit"  class="button" value="CreateTask">
 
@@ -60,6 +60,7 @@ input[type=submit] {
 {%for i in result%}
 
 <li><a href="\AddTask?ViewTask=true&Task_boardname={{i.TaskBoard_name}}">Task Board : {{i.TaskBoard_name}}</a></br>
+  <a>Owner: {{i.TaskBoard_Owner}}</a></br>
 {% for x in i.TaskBoard_members%}
   <a>Members : {{x}}</a>
 {% endfor %}

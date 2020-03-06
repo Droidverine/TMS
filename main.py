@@ -14,16 +14,19 @@ class MyUser(ndb.Model):
 #Email address of this user
   email_address = ndb.StringProperty()
 
-#EV Model class
+#Taskboard Model class
 class TaskBoard(ndb.Model):
   TaskBoard_Owner=ndb.StringProperty()
   TaskBoard_name=ndb.StringProperty()
   TaskBoard_uid=ndb.StringProperty()
   TaskBoard_members=ndb.StringProperty(repeated=True)
 
+#Task Model class
 class Tasks(ndb.Model) :
     Task_name=ndb.StringProperty() 
     Task_boardname=ndb.StringProperty()
+    Task_due=ndb.StringProperty()
+    Task_owner=ndb.StringProperty()
 
 
 
@@ -50,6 +53,14 @@ class LoginPage(webapp2.RequestHandler):
             searchq=q.filter(TaskBoard.TaskBoard_Owner==user.email())
             result=searchq.fetch()
             q1=TaskBoard.query()
+            #members
+            members=TaskBoard.query()
+            searchm=members.fetch()
+            print("members")
+            for i in searchm:
+                temp=i.TaskBoard_members
+                if user.email() in temp:
+                	result.append(i)
 
 
 			#q=TaskBoard.query()
@@ -82,9 +93,9 @@ class LoginPage(webapp2.RequestHandler):
         }
         self.response.write(template.render(template_values))
 
+#To create TaskBoard
 class TaskBoard_Create(webapp2.RequestHandler):
     def get(self):
-
       
     #If does'nt exists
         id = uuid.uuid1() 
@@ -107,6 +118,7 @@ class TaskBoard_Create(webapp2.RequestHandler):
         	self.response.headers['Content-Type'] = 'text/html'
         	self.response.write('Oops seems like taskboard already exists')
 
+#For viwing and creating taskboard
 class TaskBoardAddMembers(webapp2.RequestHandler):
     def get(self):
         if self.request.get('View'):
@@ -127,6 +139,7 @@ class TaskBoardAddMembers(webapp2.RequestHandler):
             result = searchq.fetch()
             Tb.TaskBoard_members=result.append(self.request.get('TaskBoard_members'))	
 
+#For viewing and creating Task
 class AddTask(webapp2.RequestHandler):
     def get(self):
         if self.request.get('ViewTask'):
@@ -139,15 +152,36 @@ class AddTask(webapp2.RequestHandler):
 
              }
 
-            template = JINJA_ENVIRONMENT.get_template('TaskBoard.html')
+            template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
             self.response.write(template.render(template_values))
 
+        if self.request.get('View'):
+            print("addview")
+            template_values = {
+            'Task_boardname':self.request.get('Task_boardname')
+             }
+
+            template = JINJA_ENVIRONMENT.get_template('AddTask.html')
+            self.response.write(template.render(template_values))
 
         if self.request.get('submit'):
-             tk=Tasks()
-             tk.Task_name=self.request.get('Task_name')
-             tk.Task_boardname=self.request.get('Task_boardname')
-             tk.put()
+             q=Tasks.query().filter(Tasks.Task_name==self.request.get('Task_name'),Tasks.Task_boardname==self.request.get('Task_boardname'))
+             result=list(q.fetch())
+             if len(result)<1:
+                tk=Tasks(id=self.request.get('Task_name')+""+self.request.get('Task_boardname'))
+                tk.Task_name=self.request.get('Task_name')
+                tk.Task_boardname=self.request.get('Task_boardname')
+                tk.Task_due=self.request.get('Task_due')
+                tk.Task_owner=self.request.get('Task_owner')
+                tk.put()
+                time.sleep(1)
+                self.redirect('/AddTask?ViewTask=True&Task_boardname='+self.request.get('Task_boardname'))
+
+            
+             else:
+                self.response.headers['Content-Type'] = 'text/html'
+                self.response.write('Oops..!!! Seems like task already exists in this task board. ')
+             	   
 
 app = webapp2.WSGIApplication([
     ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask)
