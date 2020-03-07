@@ -1,11 +1,9 @@
-<!DOCTYPE html>
 <html>
-<head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<style>
+  <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 * {
   width: 50%
@@ -41,44 +39,22 @@ input[type=submit] {
   width: 50%;
 }
 </style>
-</head>
 <body>
+			<div class="container">
+  <h1>{{Task_boardname}}-{{Task_name}}</h1>
 
+	<form action="\EditTask" method="get">
+	<input type="text" name="Task_name" id="Task_name" placeholder="{{result.Task_name}}"></br>
+		<input type="text" name="Task_owner" id="Task_owner" placeholder="{{result.Task_owner}}">	</br>
+	<input type="text" name="Task_due" id="Task_due" placeholder="{{result.Task_due}}">	</br>
+	 <input type="hidden" id="EditTask" name="EditTask" value="True"> 
+   <input type="hidden" name="Task_uid" id="Task_uid" value="{{result.Task_uid}}">
 
-
-<div class="container">
-  
-</br>
-<div align="left">
- 
- <form action="\TaskBoard_Create" method="get">
-  <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name.....">
-  <input type="text" name="TaskBoard_members" placeholder="Inser initial member(only one).....">
-  <input type="submit"  class="button" value="CreateTask">
-
-
-</form>
-</br>
-<h1 align="center" style="background: BLACK, color:WHITE;"> Existing Task Boards</h1>
-<ul class="list-group">
-{%for i in result%}
-
-<li class="list-group-item"><a href="\AddTask?ViewTask=true&Task_boardname={{i.TaskBoard_name}}">Task Board : {{i.TaskBoard_name}}</a></br>
-  <a>Owner: {{i.TaskBoard_Owner}}</a></br>
-{% for x in i.TaskBoard_members%}
-  <a>Members : {{x}}</a>
-{% endfor %}
-</li>
-{% endfor %}
-</ul>
+	<input type="hidden" id="Task_boardname" name="Task_boardname" value="{{Task_boardname}}">
+	<input type="submit" name="submit" id="submit" text="submit">
+	</form>
+	<div>
 </div>
-<div align="right">
-  {% if user %}
-{% else %}
-{% endif %}
-<p>you can {{ url_string }} <a href='{{ url }}'>here</a></p>
-</div>
-</div>
-
+<a href="/">Click here to view Task Boards</a>
 </body>
 </html>

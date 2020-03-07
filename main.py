@@ -27,6 +27,8 @@ class Tasks(ndb.Model) :
     Task_boardname=ndb.StringProperty()
     Task_due=ndb.StringProperty()
     Task_owner=ndb.StringProperty()
+    Task_status=ndb.StringProperty()
+    Task_uid=ndb.StringProperty()
 
 
 
@@ -168,11 +170,15 @@ class AddTask(webapp2.RequestHandler):
              q=Tasks.query().filter(Tasks.Task_name==self.request.get('Task_name'),Tasks.Task_boardname==self.request.get('Task_boardname'))
              result=list(q.fetch())
              if len(result)<1:
-                tk=Tasks(id=self.request.get('Task_name')+""+self.request.get('Task_boardname'))
+             	id = uuid.uuid1() 
+                av=str(id)
+                tk=Tasks(id=av)
+                tk.Task_uid=av
                 tk.Task_name=self.request.get('Task_name')
                 tk.Task_boardname=self.request.get('Task_boardname')
                 tk.Task_due=self.request.get('Task_due')
                 tk.Task_owner=self.request.get('Task_owner')
+                tk.Task_status="False"
                 tk.put()
                 time.sleep(1)
                 self.redirect('/AddTask?ViewTask=True&Task_boardname='+self.request.get('Task_boardname'))
@@ -182,7 +188,82 @@ class AddTask(webapp2.RequestHandler):
                 self.response.headers['Content-Type'] = 'text/html'
                 self.response.write('Oops..!!! Seems like task already exists in this task board. ')
              	   
+class EditTask(webapp2.RequestHandler):
+    def get(self):
+        if self.request.get('EditStatus'):
+           iad=self.request.get('Task_uid')
+           es = ndb.Key('Tasks',iad).get()
+           print(es)
+           es.Task_status='True'
+           #es.Task_status="True"
+           es.put()
+           q=Tasks.query()
+           searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'))
+           result=searchq.fetch()
+           template_values = {
+           'result':result,
+           'Task_boardname':self.request.get('Task_boardname')
+
+            }
+
+           template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
+           self.response.write(template.render(template_values))
+
+        if self.request.get('EditView'):
+           q=Tasks.query()
+           searchq=q.filter(Tasks.Task_uid==self.request.get('Task_uid'))
+           rst=list(searchq.fetch())
+           result=rst[0]
+           print("editview")
+           print(result)
+           template_values = {
+           'Task_name':self.request.get('Task_name'),
+           'Task_boardname':self.request.get('Task_boardname'),
+           'result':result
+
+            }
+
+           template = JINJA_ENVIRONMENT.get_template('TaskEditView.html')
+           self.response.write(template.render(template_values))
+
+        if self.request.get('EditTask'):
+           q=Tasks.query()
+           searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'),Tasks.Task_name==self.request.get('Task_name'))
+           rst=list(searchq.fetch())
+           if(len(rst)>0):
+                self.response.headers['Content-Type'] = 'text/html'
+                self.response.write('Oops..!!! Seems like task already exists in this task board. ')
+
+
+           else:
+            iad=self.request.get('Task_uid')
+            es=ndb.Key('Tasks',iad).get()
+            print(es)
+            if(self.request.get('Task_name')):
+                es.Task_name=self.request.get('Task_name')
+            if(self.request.get('Task_owner')):    
+                es.Task_owner=self.request.get('Task_owner')
+            if(self.request.get('Task_due')):    
+                es.Task_due=self.request.get('Task_due')
+                    
+                #es.Task_status="True" 
+            es.put()
+            q=Tasks.query()
+            searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'))
+            result=searchq.fetch()
+            template_values = {
+            'result':result,
+            'Task_boardname':self.request.get('Task_boardname')
+
+            }
+
+            template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
+            self.response.write(template.render(template_values))
+
+
+
 
 app = webapp2.WSGIApplication([
-    ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask)
+    ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask),
+    ('/EditTask',EditTask)
 ], debug=True)

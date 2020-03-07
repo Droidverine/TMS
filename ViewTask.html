@@ -45,7 +45,9 @@ input[type=submit] {
       <h1 style="text-align: center">{{Task_boardname}}</h1>
 <ul class="list-group">
   {% for i in result %}
-    <b ><font size=+2 ><li class="list-group-item" ><input type="checkbox" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EV_Details?ev_uid={{ i.Task_name }}">{{i.Task_name}} 
+      {% if i.Task_status=='False' %}
+    <b ><font size=+2 ><li class="list-group-item" 
+      ><input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}">{{i.Task_name}} 
         </a><div align="right"><a style="font-size: 60%">{{i.Task_owner}}</a></div></font>
 <div align="right" >
 
@@ -53,6 +55,18 @@ input[type=submit] {
 
         <br/>
         </li>
+
+        {% endif %}
+        {% if i.Task_status=='True'%}
+        <b ><font size=+2 ><li class="list-group-item disabled" ><input type="checkbox" disabled="disabled" checked="checked" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a>{{i.Task_name}} 
+        </a><div align="right"><a style="font-size: 60%">{{i.Task_owner}}</a></div></font>
+<div align="right" >
+
+      <a>Task Due: {{i.Task_due}}</a></b></div>
+
+        <br/>
+        </li>
+        {% endif %}
   {% endfor %}
 </ul>
 <div align="center"><form action="/AddTask" method="get">
@@ -60,6 +74,21 @@ input[type=submit] {
   <input type="submit" name="View" id="View" value="Add Task"></form>
 </div>
 
+<div align="left"> <a href="/">Click here to view taskboards</a></div>
+<div align="right"><a > Click here to add members</a></div>
+
 </div>
+<script>
+function myFunction(tkuid,tkboardname) {
+  var txt;
+  if (confirm("Press a button!")) {
+  window.location="/EditTask?EditStatus=True&Task_uid="+tkuid+"&Task_boardname="+tkboardname;
+  } else {
+    txt = "You pressed Cancel!";
+  }
+  
+
+}
+</script>
 </body>
 </html>
