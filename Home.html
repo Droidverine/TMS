@@ -63,11 +63,13 @@ input[type=submit] {
 <ul class="list-group">
 {%for i in result%}
 
-<li class="list-group-item"><a href="\AddTask?ViewTask=true&Task_boardname={{i.TaskBoard_name}}">Task Board : {{i.TaskBoard_name}}</a></br>
+<li class="list-group-item"><font size=+2><a href="\AddTask?ViewTask=true&TaskBoard_uid={{i.TaskBoard_uid}}&Task_boardname={{i.TaskBoard_name}}">Name : {{i.TaskBoard_name}}</a></font></br>
   <a>Owner: {{i.TaskBoard_Owner}}</a></br>
+  <a>Members :
 {% for x in i.TaskBoard_members%}
-  <a>Members : {{x}}</a>
+   {{x}}
 {% endfor %}
+</a>
 </li>
 {% endfor %}
 </ul>

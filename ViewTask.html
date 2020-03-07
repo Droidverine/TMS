@@ -47,7 +47,7 @@ input[type=submit] {
   {% for i in result %}
       {% if i.Task_status=='False' %}
     <b ><font size=+2 ><li class="list-group-item" 
-      ><input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}">{{i.Task_name}} 
+      ><input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}&TaskBoard_uid={{TaskBoard_uid}}">{{i.Task_name}} 
         </a><div align="right"><a style="font-size: 60%">{{i.Task_owner}}</a></div></font>
 <div align="right" >
 
@@ -75,17 +75,17 @@ input[type=submit] {
 </div>
 
 <div align="left"> <a href="/">Click here to view taskboards</a></div>
-<div align="right"><a > Click here to add members</a></div>
+<div align="right"><a href="/TaskBoardAddMembers?AddMemberView=True&Task_boardname={{Task_boardname}}&TaskBoard_uid={{TaskBoard_uid}}"> Click here to add members</a></div>
 
 </div>
 <script>
 function myFunction(tkuid,tkboardname) {
   var txt;
-  if (confirm("Press a button!")) {
+  if (confirm("Do you really want to mark this task Done!??")) {
   window.location="/EditTask?EditStatus=True&Task_uid="+tkuid+"&Task_boardname="+tkboardname;
   } else {
-    txt = "You pressed Cancel!";
-  }
+  window.location="AddTask?ViewTask=true&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}";
+   }
   
 
 }

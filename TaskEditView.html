@@ -45,10 +45,19 @@ input[type=submit] {
 
 	<form action="\EditTask" method="get">
 	<input type="text" name="Task_name" id="Task_name" placeholder="{{result.Task_name}}"></br>
-		<input type="text" name="Task_owner" id="Task_owner" placeholder="{{result.Task_owner}}">	</br>
+    <label for="members">Choose a member to assign task :</label>
+        <select name="Task_owner" id="Task_owner"">
+
+    {% for x in TaskBoard_members %}
+      <option value="{{x}}">{{x}}</option>
+
+    {% endfor %}
+  
+</select>
 	<input type="text" name="Task_due" id="Task_due" placeholder="{{result.Task_due}}">	</br>
 	 <input type="hidden" id="EditTask" name="EditTask" value="True"> 
    <input type="hidden" name="Task_uid" id="Task_uid" value="{{result.Task_uid}}">
+   <input type="hidden" name="TaskBoard_uid" id="TaskBoard_uid" value="{{TaskBoard_uid}}">
 
 	<input type="hidden" id="Task_boardname" name="Task_boardname" value="{{Task_boardname}}">
 	<input type="submit" name="submit" id="submit" text="submit">

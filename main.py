@@ -129,17 +129,47 @@ class TaskBoardAddMembers(webapp2.RequestHandler):
             result = searchq.fetch()
 
             template_values = {
-            'result':result
+            'result':result,
+            'TaskBoard_uid':self.request.get('TaskBoard_uid')
              }
 
             template = JINJA_ENVIRONMENT.get_template('AddMember.html')
             self.response.write(template.render(template_values))
-        if self.request.get('AddMember'):
-            Tb=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid'))
+        if self.request.get('AddMemberView'):
+            user = users.get_current_user()
+
             q=TaskBoard.query()
             searchq = q.filter(TaskBoard.TaskBoard_name==self.request.get('TaskBoard_name'),TaskBoard.TaskBoard_Owner==user.email())
             result = searchq.fetch()
-            Tb.TaskBoard_members=result.append(self.request.get('TaskBoard_members'))	
+
+            template_values = {
+            'result':result,
+            'TaskBoard_uid':self.request.get('TaskBoard_uid')
+             }
+
+            template = JINJA_ENVIRONMENT.get_template('AddMember.html')
+            self.response.write(template.render(template_values))	
+        if self.request.get('AddMember'):
+            user = users.get_current_user()
+            print('ghghghghgh')
+            print(self.request.get('TaskBoard_uid'))
+            Tb=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid')).get()
+            q=TaskBoard.query()
+            searchq = q.filter(TaskBoard.TaskBoard_uid==self.request.get('TaskBoard_uid'))
+            result = searchq.fetch()
+            print('shivraj')
+            kbc=result[0]
+            kk=kbc.TaskBoard_members
+            fin=list(kbc.TaskBoard_members)
+            nl=[self.request.get('TaskBoard_members')]
+            for f in fin:
+                nl.append(f)
+            print(nl)
+
+            Tb.TaskBoard_members=nl
+            Tb.put()
+            self.redirect('/')	            
+
 
 #For viewing and creating Task
 class AddTask(webapp2.RequestHandler):
@@ -150,7 +180,8 @@ class AddTask(webapp2.RequestHandler):
             result=searchq.fetch()
             template_values = {
             'result':result,
-            'Task_boardname':self.request.get('Task_boardname')
+            'Task_boardname':self.request.get('Task_boardname'),
+            'TaskBoard_uid':self.request.get('TaskBoard_uid')
 
              }
 
@@ -160,7 +191,8 @@ class AddTask(webapp2.RequestHandler):
         if self.request.get('View'):
             print("addview")
             template_values = {
-            'Task_boardname':self.request.get('Task_boardname')
+            'Task_boardname':self.request.get('Task_boardname'),
+            'TaskBoard_uid':self.request.get('TaskBoard_uid')
              }
 
             template = JINJA_ENVIRONMENT.get_template('AddTask.html')
@@ -204,6 +236,7 @@ class EditTask(webapp2.RequestHandler):
            'result':result,
            'Task_boardname':self.request.get('Task_boardname')
 
+
             }
 
            template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
@@ -213,13 +246,22 @@ class EditTask(webapp2.RequestHandler):
            q=Tasks.query()
            searchq=q.filter(Tasks.Task_uid==self.request.get('Task_uid'))
            rst=list(searchq.fetch())
+           #To get the taskboard members
+           q1=TaskBoard.query()
+           searchq1=q1.filter(TaskBoard.TaskBoard_uid==self.request.get('TaskBoard_uid'))
+           rst1=searchq1.fetch()
+           rst1=rst1[0]
+           membersarray=rst1.TaskBoard_members
            result=rst[0]
            print("editview")
            print(result)
            template_values = {
            'Task_name':self.request.get('Task_name'),
            'Task_boardname':self.request.get('Task_boardname'),
-           'result':result
+           'result':result,
+           'Taskboard':rst1,
+           'TaskBoard_members': membersarray,
+           'TaskBoard_uid':self.request.get('TaskBoard_uid')
 
             }
 
@@ -227,6 +269,7 @@ class EditTask(webapp2.RequestHandler):
            self.response.write(template.render(template_values))
 
         if self.request.get('EditTask'):
+
            q=Tasks.query()
            searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'),Tasks.Task_name==self.request.get('Task_name'))
            rst=list(searchq.fetch())
@@ -236,6 +279,8 @@ class EditTask(webapp2.RequestHandler):
 
 
            else:
+            print('bhadva')
+            print(self.request.get('TaskBoard_uid'))
             iad=self.request.get('Task_uid')
             es=ndb.Key('Tasks',iad).get()
             print(es)
@@ -251,15 +296,9 @@ class EditTask(webapp2.RequestHandler):
             q=Tasks.query()
             searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'))
             result=searchq.fetch()
-            template_values = {
-            'result':result,
-            'Task_boardname':self.request.get('Task_boardname')
-
-            }
-
-            template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
-            self.response.write(template.render(template_values))
-
+            
+            time.sleep(1)
+            self.redirect('/AddTask?ViewTask=true&Task_boardname='+self.request.get('Task_boardname')+"&TaskBoard_uid="+self.request.get('TaskBoard_uid'))
 
 
 
