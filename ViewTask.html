@@ -71,9 +71,12 @@ input[type=submit] {
 </ul>
 <div align="center"><form action="/AddTask" method="get">
   <input type="hidden" name="Task_boardname" value="{{Task_boardname}}">
-  <input type="submit" name="View" id="View" value="Add Task"></form>
+  <input type="submit" name="View" id="View" value="Add Task">
+  <input type="hidden" name="TaskBoard_uid" value="{{TaskBoard_uid}}">
+</form>
 </div>
 
+ <a href="/AddTask?TaskBoard_uid={{TaskBoard_uid}}&View=Add+Task">Click here to add Task</a>
 <div align="left"> <a href="/">Click here to view taskboards</a></div>
 <div align="right"><a href="/TaskBoardAddMembers?AddMemberView=True&Task_boardname={{Task_boardname}}&TaskBoard_uid={{TaskBoard_uid}}"> Click here to add members</a></div>
 
@@ -82,9 +85,9 @@ input[type=submit] {
 function myFunction(tkuid,tkboardname) {
   var txt;
   if (confirm("Do you really want to mark this task Done!??")) {
-  window.location="/EditTask?EditStatus=True&Task_uid="+tkuid+"&Task_boardname="+tkboardname;
+  window.location="/EditTask?EditStatus=True&Task_uid="+tkuid+"&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}";
   } else {
-  window.location="AddTask?ViewTask=true&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}";
+  window.location="AddTask?ViewTask=true&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}&TaskBoard_uid={{TaskBoard_uid}}";
    }
   
 

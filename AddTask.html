@@ -47,12 +47,26 @@ input[type=submit] {
 	<input type="text" name="Task_name" id="Task_name" placeholder="Enter task name........"></br>
 		<input type="text" name="Task_owner" id="Task_owner" placeholder=" Assign task to........">	</br>
 	<input type="text" name="Task_due" id="Task_due" placeholder="Task Due date........">	</br>
-	
+	  <input type="hidden" id="TaskBoard_uid" name="TaskBoard_uid" value="{{TaskBoard_uid}}">
+
 	<input type="hidden" id="Task_boardname" name="Task_boardname" value="{{Task_boardname}}">
 	<input type="submit" name="submit" id="submit" text="submit">
 	</form>
 	<div>
 </div>
 <a href="/">Click here to view Task</a>
+<script>
+function myFunction(tkuid,tkboardname) {
+  var txt;
+  if (confirm("Do you really want to mark this task Done!??")) {
+  window.location="/EditTask?EditStatus=True&Task_uid="+tkuid+"&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}";
+  } else {
+  window.location="AddTask?ViewTask=true&Task_boardname="+tkboardname+"&TaskBoard_uid={{TaskBoard_uid}}&TaskBoard_uid={{TaskBoard_uid}}";
+   }
+  
+
+}
+</script>
 </body>
+
 </html>

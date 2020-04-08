@@ -53,7 +53,15 @@ input[type=submit] {
  
  <form action="\TaskBoard_Create" method="get">
   <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name.....">
-  <input type="text" name="TaskBoard_members" placeholder="Inser initial member(only one).....">
+ <label for="members">Choose a member to add to Taskboard :</label>
+        <select name="Task_owner" id="Task_owner"">
+
+    {% for x in usersinsystem %}
+      <option value="{{x}}">{{x}}</option>
+
+    {% endfor %}
+  
+</select>
   <input type="submit"  class="button" value="CreateTask">
 
 
