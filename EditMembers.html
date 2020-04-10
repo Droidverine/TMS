@@ -43,17 +43,18 @@ input[type=submit] {
 			<div class="container">
   <h1>{{result.TaskBoard_uid}}</h1>
 
-	<form action="\TaskBoardAddMembers" method="get">
-     <label for="members">Choose a member to add to Taskboard :</label>
-        <select name="TaskBoard_members" id="TaskBoard_members"">
-    
-    {% for x in usersinsystem %}
+	<form action="\TaskBoard_RemoveUser" method="get">
+     <label for="members">Choose a member to remove users from  Taskboard :</label>
+        <select name="Member" id="Member"">
+
+    {% for x in result %}
       <option value="{{x}}">{{x}}</option>
 
     {% endfor %}
   
 </select>
 	 <input type="hidden" id="TaskBoard_uid" name="TaskBoard_uid" value="{{TaskBoard_uid}}">
+  <input type="hidden" id="Taskboard_editmember" name="Taskboard_editmember" value="True">
 
 	<input type="hidden" id="AddMember" name="AddMember" value="True">
 	<input type="submit" name="submit" id="submit" text="submit">

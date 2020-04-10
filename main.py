@@ -155,6 +155,85 @@ class TaskBoard_Create(webapp2.RequestHandler):
             self.response.headers['Content-Type'] = 'text/html'
             self.response.write('Oops seems like taskboard already exists')
 
+class TaskBoard_Delete(webapp2.RequestHandler):
+    def get(self):
+
+   
+        user = users.get_current_user()
+
+        taskboardchecker = ndb.Key('TaskBoard',""+self.request.get('TaskBoard_name')+""+user.email()).get()
+        print("ghe")
+        print(self.request.get('TaskBoard_name'))
+        #Checking whether owner is performing this operation
+        if user.email()==taskboardchecker.TaskBoard_Owner:
+           
+            userdata = ndb.Key('Users', user.email()).get()
+            if(self.request.get('TaskBoard_name')+""+user.email() in userdata.users_taskboardslist):
+                ulist=list(userdata.users_taskboardslist)
+                ulist.remove(self.request.get('TaskBoard_name')+""+user.email())
+                userdata.users_taskboardslist=ulist
+            
+            userdata.put()
+            print('ghe')
+            print(ulist)
+            taskboardchecker.key.delete()
+            self.redirect('/')
+
+          
+        else:
+            self.response.headers['Content-Type'] = 'text/html'
+            self.response.write('You are not owner of this taskboard to perform this operation')
+
+#Taskboard remove user
+class TaskBoard_RemoveUser(webapp2.RequestHandler):
+    def get(self):
+      if self.request.get('TaskboardEditMemberView'):
+        #query only to get users
+        members=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid')).get()
+        user = users.get_current_user()
+        us=members.TaskBoard_members
+        print('members')
+        usersinsystem=[]
+        for i in us:
+          usersinsystem.append(i)
+        
+        print(usersinsystem)
+
+     
+        template = JINJA_ENVIRONMENT.get_template('EditMembers.html')
+
+        template_values = {
+            
+            'result':usersinsystem,
+            'TaskBoard_uid':self.request.get('TaskBoard_uid')
+
+        } 
+        self.response.write(template.render(template_values))
+      if self.request.get('Taskboard_editmember'):
+        user = users.get_current_user()
+        parsed_taskboardid =urlparse(self.request.get('TaskBoard_uid'))
+
+        members=ndb.Key(TaskBoard,parsed_taskboardid.path).get()
+        if user.email()==members.TaskBoard_Owner:
+          result=members.TaskBoard_members
+          parsed_member = urlparse(self.request.get('Member'))
+          print('result')
+          print(result)
+          result.remove(parsed_member.path)
+          members.TaskBoard_members=result
+          members.put()
+          removeuser=ndb.Key(Users,parsed_member.path).get()
+          result=removeuser.users_taskboardslist
+          result.remove(parsed_taskboardid.path)
+          removeuser.users_taskboardslist=result
+          removeuser.put()
+          self.redirect('/')
+        else:
+           print('not owner')
+
+
+
+                          
 #For viwing and creating taskboard
 class TaskBoardAddMembers(webapp2.RequestHandler):
     def get(self):
@@ -245,6 +324,7 @@ class AddTask(webapp2.RequestHandler):
         if self.request.get('ViewTask'):
             parsed_url = urlparse(self.request.get('TaskBoard_uid'))
             Taskslistmodel=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid')).get()
+            members=Taskslistmodel.TaskBoard_members
             print('taskslist')
             print(Taskslistmodel.TaskBoard_tasksuidlist)
             templist=Taskslistmodel.TaskBoard_tasksuidlist
@@ -258,7 +338,8 @@ class AddTask(webapp2.RequestHandler):
             template_values = {
             'result':result,
             'Task_boardname':self.request.get('Task_boardname'),
-            'TaskBoard_uid':self.request.get('TaskBoard_uid')
+            'TaskBoard_uid':self.request.get('TaskBoard_uid'),
+            'Members':members
 
              }
 
@@ -363,9 +444,7 @@ class EditTask(webapp2.RequestHandler):
 
         if self.request.get('EditTask'):
 
-           #q=Tasks.query()
-           #searchq=q.filter(Tasks.Task_boardname==self.request.get('Task_boardname'),Tasks.Task_name==self.request.get('Task_name'))
-           #rst=list(searchq.fetch())
+          
            parsed_tkname = urlparse(self.request.get('Task_name'))
            parsed_tkboard = urlparse(self.request.get('Task_boardname'))
            parsed_tkowner=urlparse(self.request.get('Task_owner'))
@@ -479,5 +558,5 @@ class EditTask(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask),
-    ('/EditTask',EditTask)
+    ('/EditTask',EditTask),('/TaskBoard_Delete',TaskBoard_Delete),('/TaskBoard_RemoveUser',TaskBoard_RemoveUser)
 ], debug=True)
