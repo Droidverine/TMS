@@ -42,13 +42,16 @@ input[type=submit] {
 <body>
 
             <div class="container">
-      <h1 style="text-align: center">{{Task_boardname}}</h1>
+      <h1 style="text-align: center">{{Task_boardname}}</h1></br> 
+      <center>
+      <h3>Total Tasks:{{Total_tasks}}  &nbsp; Total completed:{{Total_completed}} &nbsp; Completed Today:{{Total_completedtoday}} &nbsp; Active Tasks:{{Total_active}}</h3>
+      </center>
 <ul class="list-group">
   {% for i in result %}
       {% if i.Task_status=='False' %}
-      {% if i.Task_owner in Members %}
+      {% if i.Task_owner in Members or i.Task_owner=="Not Assigned" %}
     <b ><font size=+2 ><li class="list-group-item" 
-      ><input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}&TaskBoard_uid={{TaskBoard_uid}}">{{i.Task_name}} 
+      >{{loop.index}}.&nbsp;&nbsp;<input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}&TaskBoard_uid={{TaskBoard_uid}}">{{i.Task_name}} 
         </a><div align="right"><a style="font-size: 60%">{{i.Task_owner}}</a></div></font>
 <div align="right" >
 
@@ -56,13 +59,13 @@ input[type=submit] {
 
         <br/>
           <div align="center">        <button type="button" class="btn btn-default btn-sm"
-        onClick="location.href='/'">
+        onClick="location.href='/Task_Delete?TaskBoard_uid={{TaskBoard_uid}}&Task_name={{i.Task_name}}'">
           <span class="glyphicon glyphicon-remove"></span> Delete 
         </button></div>
         </li>
         {% else %}
          <b ><font size=+2 ><li class="list-group-item" style="background: RED;" 
-      ><input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}&TaskBoard_uid={{TaskBoard_uid}}">{{i.Task_name}} 
+      > <input type="checkbox" onclick="myFunction('{{i.Task_uid}}','{{i.Task_boardname}}')" style="vertical-align: right" class="form-check-input" name="ev_uid"  value="{{i.Task_name}}"> <a href="/EditTask?EditView=True&Task_uid={{ i.Task_uid }}&Task_boardname={{i.Task_boardname}}&Task_name={{i.Task_name}}&TaskBoard_uid={{TaskBoard_uid}}">{{i.Task_name}} 
         </a><div align="right"><a style="font-size: 60%">{{i.Task_owner}}</a></div></font>
 <div align="right" >
 
@@ -70,7 +73,7 @@ input[type=submit] {
 
         <br/>
           <div align="center">        <button type="button" class="btn btn-default btn-sm"
-        onClick="location.href='/'">
+        onClick="location.href='/Task_Delete?TaskBoard_uid={{TaskBoard_uid}}&Task_name={{i.Task_name}}'">
           <span class="glyphicon glyphicon-remove"></span> Delete 
         </button></div>
         </li>
@@ -102,7 +105,7 @@ input[type=submit] {
 </form>
 </div>
 
- <a href="/AddTask?TaskBoard_uid={{TaskBoard_uid}}&View=Add+Task">Click here to add Task</a>
+ <a href="/RenameTaskboard?RenameView=True&TaskBoard_uid={{TaskBoard_uid}}&Task_boardname={{Task_boardname}}">Click here to Rename TaskBoard</a>
 <div align="left"> <a href="/TaskBoard_RemoveUser?TaskboardEditMemberView=True&TaskBoard_uid={{TaskBoard_uid}}">Click here to Edit taskboard member</a></div>
 <div align="center">
    <a href='/TaskBoard_Delete?TaskBoard_name={{Task_boardname}}'>here to delete</a>

@@ -54,7 +54,7 @@ input[type=submit] {
  <form action="\TaskBoard_Create" method="get">
   <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name.....">
  <label for="members">Choose a member to add to Taskboard :</label>
-        <select name="Task_owner" id="Task_owner"">
+        <select name="TaskBoard_members" id="TaskBoard_members">
 
     {% for x in usersinsystem %}
       <option value="{{x}}">{{x}}</option>

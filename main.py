@@ -6,6 +6,8 @@ from google.appengine.api import users
 import uuid
 import os
 from urlparse import urlparse, parse_qs
+from datetime import datetime
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+"/"))
 
@@ -31,6 +33,7 @@ class Tasks(ndb.Model) :
     Task_owner=ndb.StringProperty()
     Task_status=ndb.StringProperty()
     Task_uid=ndb.StringProperty()
+    Task_completedDate=ndb.StringProperty()
 
 
 
@@ -142,10 +145,20 @@ class TaskBoard_Create(webapp2.RequestHandler):
                 ulist=list(userdata.users_taskboardslist)
                 ulist.append(self.request.get('TaskBoard_name')+""+user.email())
                 userdata.users_taskboardslist=ulist
+
+
             else:
             	ulist=[self.request.get('TaskBoard_name')+""+user.email()]
 
             userdata.put()
+            members=[self.request.get('TaskBoard_members')]
+            for i in members:
+            	userdata = ndb.Key('Users',i).get()
+                ulist=list(userdata.users_taskboardslist)
+                ulist.append(self.request.get('TaskBoard_name')+""+user.email())
+                userdata.users_taskboardslist=ulist
+            userdata.put()    
+
             print('ghe')
             print(ulist)
 
@@ -197,7 +210,7 @@ class TaskBoard_RemoveUser(webapp2.RequestHandler):
         for i in us:
           usersinsystem.append(i)
         
-        print(usersinsystem)
+
 
      
         template = JINJA_ENVIRONMENT.get_template('EditMembers.html')
@@ -237,35 +250,20 @@ class TaskBoard_RemoveUser(webapp2.RequestHandler):
 #For viwing and creating taskboard
 class TaskBoardAddMembers(webapp2.RequestHandler):
     def get(self):
-        if self.request.get('View'):
-          #query only to get users
-            searchq = ndb.Key(self.request.get('TaskBoard_name')+""+user.email()).get
-            result = searchq
-            q=Users.query()
-            us =q.fetch()
-            usersinsystem=[]
-            for i in us:
-              usersinsystem.append(i.email_address)
-            usersinsystem.append('')
-            print('usersinsystem')        
-
-            print(usersinsystem)    
-
-            template_values = {
-            'result':result,
-            'usersinsystem':usersinsystem,
-            'TaskBoard_uid':self.request.get('TaskBoard_uid')
-             }
-
-            template = JINJA_ENVIRONMENT.get_template('AddMember.html')
-            self.response.write(template.render(template_values))
         if self.request.get('AddMemberView'):
             user = users.get_current_user()
+            taskboarduidparsed=urlparse(self.request.get('TaskBoard_uid'))
+            searchq = ndb.Key(TaskBoard,taskboarduidparsed.path).get()
+            result = searchq
+            print('usersinsystem')        
+            print(result)        
+
             q=Users.query()
             us =q.fetch()
             usersinsystem=[]
             for i in us:
-              usersinsystem.append(i.email_address)
+              if i.email_address not in result.TaskBoard_members and i.email_address != result.TaskBoard_Owner:
+                usersinsystem.append(i.email_address)
             usersinsystem.append('')
             if user.email() in usersinsystem:
               usersinsystem.remove(user.email())
@@ -329,18 +327,45 @@ class AddTask(webapp2.RequestHandler):
             print(Taskslistmodel.TaskBoard_tasksuidlist)
             templist=Taskslistmodel.TaskBoard_tasksuidlist
             result=[]
+            completedct=0
+            totalct=0
+            activect=0
+            completedtodayct=0
+            today=str(datetime.today().strftime('%Y-%m-%d'))
+
             for i in templist:
                 if(i!='ep'):
                     taskslist = ndb.Key(Tasks,i).get()
+                    if taskslist!=None:
+                        if taskslist.Task_status=='True':
+                            completedct=completedct+1
+                            totalct=totalct+1
+                        if taskslist.Task_status=='False':
+                        	activect=activect+1
+                        if taskslist.Task_completedDate==today:
+	                        completedtodayct=completedtodayct+1
                     result.append(taskslist)
             print(result)
+            
+
+
+            print("counts")
+            print("Total tasks="+str(totalct))
+            print("Active="+str(activect))
+            print("completedct="+str(completedct))
+            print("completedtoday="+str(completedtodayct))
 
             template_values = {
             'result':result,
             'Task_boardname':self.request.get('Task_boardname'),
             'TaskBoard_uid':self.request.get('TaskBoard_uid'),
-            'Members':members
+            'Members':members,
+            'Total_tasks':totalct,
+            'Total_completed':completedct,
+            'Total_completedtoday':completedtodayct,
+            'Total_active':activect
 
+  
              }
 
             template = JINJA_ENVIRONMENT.get_template('ViewTask.html')
@@ -378,7 +403,13 @@ class AddTask(webapp2.RequestHandler):
                 tk.Task_name=self.request.get('Task_name')
                 tk.Task_boardname=self.request.get('Task_boardname')
                 tk.Task_due=self.request.get('Task_due')
-                tk.Task_owner=self.request.get('Task_owner')
+                tkowner=self.request.get('Task_owner')
+                print('tkowner')
+                print(tkowner)
+                if tkowner!='':
+                    tk.Task_owner=self.request.get('Task_owner')
+                else:	
+                    tk.Task_owner='Not Assigned'
                 tk.Task_status="False"
                 tk.put()
                 templist=taskchecker.TaskBoard_tasksuidlist
@@ -390,7 +421,73 @@ class AddTask(webapp2.RequestHandler):
                 time.sleep(1)
                 self.redirect('/AddTask?ViewTask=True&Task_boardname='+self.request.get('Task_boardname')+'&TaskBoard_uid='+self.request.get('TaskBoard_uid'))
 
+class Task_Delete(webapp2.RequestHandler):
+    def get(self):
 
+        print('delete task')
+        user = users.get_current_user()
+        parsed_taskboardid=urlparse(self.request.get('TaskBoard_uid'))
+
+        taskboard = ndb.Key('TaskBoard',parsed_taskboardid.path).get()
+        task=ndb.Key('Tasks',parsed_taskboardid.path+""+self.request.get('Task_name')).get()
+        taskboardtaskslist=taskboard.TaskBoard_tasksuidlist
+        taskboardtaskslist.remove(parsed_taskboardid.path+""+self.request.get('Task_name'))
+        taskboard.TaskBoard_tasksuidlist=taskboardtaskslist
+        taskboard.put()
+        task.key.delete()
+
+        self.redirect('/')
+        time.sleep(1)
+
+class RenameTaskboard(webapp2.RequestHandler):
+    def get(self):
+      if self.request.get('RenameView'):
+        parsed_taskboardid=urlparse(self.request.get('TaskBoard_uid'))
+        template_values = {
+           'TaskBoard_uid':parsed_taskboardid.path,
+           'Task_boardname':self.request.get('Task_boardname')
+            }
+
+        template = JINJA_ENVIRONMENT.get_template('RenameTaskboard.html')
+        self.response.write(template.render(template_values))
+      if self.request.get('PerformRename'):
+          parsed_taskboardid=urlparse(self.request.get('TaskBoard_uid'))  
+          taskboard=ndb.Key(TaskBoard,parsed_taskboardid.path).get()
+          taskboardowner=taskboard.TaskBoard_Owner
+          taskboarduid=taskboard.TaskBoard_uid
+          taskboardtasksuid=taskboard.TaskBoard_tasksuidlist
+          taskboardmembers=taskboard.TaskBoard_members
+          res=taskboardmembers
+          print(res[0])
+          if len(taskboardmembers)>0:
+            for i in taskboardmembers:
+              if(i != ''):
+                Usermod=ndb.Key(Users,i).get()
+                if(parsed_taskboardid.path in Usermod.users_taskboardslist):
+                  result=Usermod.users_taskboardslist
+                  result.remove(parsed_taskboardid.path)
+                  result.append(self.request.get('Task_boardname')+""+taskboardowner)
+                  Usermod.users_taskboardslist=result
+                  Usermod.put()
+            Usermod=ndb.Key(Users,taskboardowner).get()
+            result=Usermod.users_taskboardslist
+            result.remove(parsed_taskboardid.path)
+            result.append(self.request.get('Task_boardname')+""+taskboardowner)
+            Usermod.users_taskboardslist=result
+            Usermod.put()
+            taskboard.key.delete()
+            tk=TaskBoard(id=self.request.get('Task_boardname')+""+taskboardowner)
+            tk.TaskBoard_tasksuidlist=taskboardtasksuid
+            tk.TaskBoard_uid=taskboarduid
+            tk.TaskBoard_name=self.request.get('Task_boardname')
+            tk.TaskBoard_members=taskboardmembers
+            tk.TaskBoard_Owner=taskboardowner
+            tk.TaskBoard_uid=self.request.get('Task_boardname')+""+taskboardowner
+            tk.put()
+            time.sleep(1)
+            self.redirect('/')
+    
+    
 class EditTask(webapp2.RequestHandler):
     def get(self):
         if self.request.get('EditStatus'):
@@ -398,6 +495,7 @@ class EditTask(webapp2.RequestHandler):
            es = ndb.Key('Tasks',iad).get()
            print(es)
            es.Task_status='True'
+           es.Task_completedDate=""+datetime.today().strftime('%Y-%m-%d')
            es.put()
            Taskslistmodel=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid')).get()
            Taskslistmodel=Taskslistmodel.TaskBoard_tasksuidlist
@@ -406,10 +504,40 @@ class EditTask(webapp2.RequestHandler):
                Taskslistmodel=ndb.Key(Tasks,i).get()
                result.append(Taskslistmodel)
                print(i)
+           parsed_url = urlparse(self.request.get('TaskBoard_uid'))
+           Taskslistmodel=ndb.Key(TaskBoard,self.request.get('TaskBoard_uid')).get()
+           members=Taskslistmodel.TaskBoard_members
+           print('taskslist')
+           print(Taskslistmodel.TaskBoard_tasksuidlist)
+           templist=Taskslistmodel.TaskBoard_tasksuidlist
+           result=[]
+           completedct=0
+           totalct=0
+           activect=0
+           completedtodayct=0
+           today=str(datetime.today().strftime('%Y-%m-%d'))
+
+           for i in templist:
+               if(i!='ep'):
+                   taskslist = ndb.Key(Tasks,i).get()
+                   if taskslist!=None:
+                       if taskslist.Task_status=='True':
+                           completedct=completedct+1
+                           totalct=totalct+1
+                       if taskslist.Task_status=='False':
+                           activect=activect+1
+                       if taskslist.Task_completedDate==today:
+                           completedtodayct=completedtodayct+1
+                   result.append(taskslist)
+           print(result)   
            template_values = {
            'result':result,
            'Task_boardname':self.request.get('Task_boardname'),
-           'TaskBoard_uid':self.request.get('TaskBoard_uid')
+           'TaskBoard_uid':self.request.get('TaskBoard_uid'),
+           'Total_tasks':totalct,
+           'Total_completed':completedct,
+           'Total_completedtoday':completedtodayct,
+           'Total_active':activect
 
 
             }
@@ -557,6 +685,6 @@ class EditTask(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask),
-    ('/EditTask',EditTask),('/TaskBoard_Delete',TaskBoard_Delete),('/TaskBoard_RemoveUser',TaskBoard_RemoveUser)
+    ('/', LoginPage),('/TaskBoard_Create',TaskBoard_Create),('/TaskBoardAddMembers',TaskBoardAddMembers),('/AddTask',AddTask),('/RenameTaskboard',RenameTaskboard),
+    ('/EditTask',EditTask),('/TaskBoard_Delete',TaskBoard_Delete),('/TaskBoard_RemoveUser',TaskBoard_RemoveUser),('/Task_Delete',Task_Delete)
 ], debug=True)
