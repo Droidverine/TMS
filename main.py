@@ -153,10 +153,11 @@ class TaskBoard_Create(webapp2.RequestHandler):
             userdata.put()
             members=[self.request.get('TaskBoard_members')]
             for i in members:
-            	userdata = ndb.Key('Users',i).get()
-                ulist=list(userdata.users_taskboardslist)
-                ulist.append(self.request.get('TaskBoard_name')+""+user.email())
-                userdata.users_taskboardslist=ulist
+                if i!="":
+                    userdata = ndb.Key('Users',i).get()
+                    ulist=list(userdata.users_taskboardslist)
+                    ulist.append(self.request.get('TaskBoard_name')+""+user.email())
+                    userdata.users_taskboardslist=ulist
             userdata.put()    
 
             print('ghe')
@@ -175,10 +176,20 @@ class TaskBoard_Delete(webapp2.RequestHandler):
         user = users.get_current_user()
 
         taskboardchecker = ndb.Key('TaskBoard',""+self.request.get('TaskBoard_name')+""+user.email()).get()
+        taskslist=taskboardchecker.TaskBoard_tasksuidlist
+
         print("ghe")
         print(self.request.get('TaskBoard_name'))
         #Checking whether owner is performing this operation
         if user.email()==taskboardchecker.TaskBoard_Owner:
+            for i in taskslist:
+                if i != "":
+                    print('task')
+                    print(i)
+                    task=ndb.Key('Tasks',i).get()
+                    if task!=None:
+                        task.key.delete()
+
            
             userdata = ndb.Key('Users', user.email()).get()
             if(self.request.get('TaskBoard_name')+""+user.email() in userdata.users_taskboardslist):

@@ -42,7 +42,8 @@ input[type=submit] {
 <body>
 
             <div class="container">
-      <h1 style="text-align: center">{{Task_boardname}}</h1></br> 
+
+      <h1 style="text-align: center;background-color: BLACK; color:WHITE;" >{{Task_boardname}}</h1></br> 
       <center>
       <h3>Total Tasks:{{Total_tasks}}  &nbsp; Total completed:{{Total_completed}} &nbsp; Completed Today:{{Total_completedtoday}} &nbsp; Active Tasks:{{Total_active}}</h3>
       </center>
@@ -104,15 +105,21 @@ input[type=submit] {
   <input type="hidden" name="TaskBoard_uid" value="{{TaskBoard_uid}}">
 </form>
 </div>
+</br>
+</br></br>
+</br></br>
+</br>
+<center>
+<div class="btn-group" >
+  <button  onClick="location.href='/TaskBoardAddMembers?AddMemberView=True&Task_boardname={{Task_boardname}}&TaskBoard_uid={{TaskBoard_uid}}'">Add Members</button>
+  <button onClick="location.href='/TaskBoard_RemoveUser?TaskboardEditMemberView=True&TaskBoard_uid={{TaskBoard_uid}}'">Remove Members</button>
+  <button onClick="location.href='/RenameTaskboard?RenameView=True&TaskBoard_uid={{TaskBoard_uid}}&Task_boardname={{Task_boardname}}'" >Rename Taskboard</button>
+    <button  onClick="location.href='/TaskBoard_Delete?TaskBoard_name={{Task_boardname}}'" >Delete Taskboard</button>
 
- <a href="/RenameTaskboard?RenameView=True&TaskBoard_uid={{TaskBoard_uid}}&Task_boardname={{Task_boardname}}">Click here to Rename TaskBoard</a>
-<div align="left"> <a href="/TaskBoard_RemoveUser?TaskboardEditMemberView=True&TaskBoard_uid={{TaskBoard_uid}}">Click here to Edit taskboard member</a></div>
-<div align="center">
-   <a href='/TaskBoard_Delete?TaskBoard_name={{Task_boardname}}'>here to delete</a>
 </div>
-<div align="right"><a href="/TaskBoardAddMembers?AddMemberView=True&Task_boardname={{Task_boardname}}&TaskBoard_uid={{TaskBoard_uid}}"> Click here to add members</a></div>
+</center>
+</div>
 
-</div>
 <script>
 function myFunction(tkuid,tkboardname) {
   var txt;

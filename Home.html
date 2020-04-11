@@ -45,14 +45,37 @@ input[type=submit] {
 <body>
 
 
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">TASKS MGMT SYSTEM</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      
+       <ul class="nav navbar-nav">
+        <li class="active"><a href="/NavBar?request=Home">Home</a></li>
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ url }}"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <div class="container">
   
 </br>
 <div align="left">
- 
+ <h1 align="center" style="background-color: BLACK; color:WHITE;"> Use following field to create a Task Boards</h1>
+
  <form action="\TaskBoard_Create" method="get">
-  <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name.....">
+  <input type="text" name="TaskBoard_name" placeholder="Enter TaskBoard Name....." required="true">
  <label for="members">Choose a member to add to Taskboard :</label>
         <select name="TaskBoard_members" id="TaskBoard_members">
 
@@ -67,7 +90,7 @@ input[type=submit] {
 
 </form>
 </br>
-<h1 align="center" style="background: BLACK, color:WHITE;"> Existing Task Boards</h1>
+<h1 align="center" style="background-color: BLACK; color:WHITE;"> Existing Task Boards</h1>
 <ul class="list-group">
 {%for i in result%}
 
