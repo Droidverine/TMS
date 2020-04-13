@@ -40,6 +40,28 @@ input[type=submit] {
 }
 </style>
 <body>
+    <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">TASKS MGMT SYSTEM</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      
+       <ul class="nav navbar-nav">
+        <li ><a href="/">Home</a></li>
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ url }}"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 			<div class="container">
   <h1>{{Task_boardname}}-{{Task_name}}</h1>
 
@@ -47,9 +69,12 @@ input[type=submit] {
 	<input type="text" name="Task_name" id="Task_name" value="{{result.Task_name}}"></br>
     <label for="members">Choose a member to assign task :</label>
         <select name="Task_owner" id="Task_owner"">
+      <option value="Not Assigned">Dont Assign</option>
 
     {% for x in TaskBoard_members %}
+    {% if x != "" %}
       <option value="{{x}}">{{x}}</option>
+    {% endif %}
 
     {% endfor %}
   

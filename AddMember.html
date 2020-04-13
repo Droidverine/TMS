@@ -39,9 +39,32 @@ input[type=submit] {
   width: 50%;
 }
 </style>
+
 <body>
+  <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">TASKS MGMT SYSTEM</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      
+       <ul class="nav navbar-nav">
+        <li ><a href="/">Home</a></li>
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ url }}"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 			<div class="container">
-  <h1>{{result.TaskBoard_uid}}</h1>
+  <h1>Task Board : {{result.TaskBoard_name}}</h1>
 
 	<form action="\TaskBoardAddMembers" method="get">
      <label for="members">Choose a member to add to Taskboard :</label>
@@ -51,6 +74,7 @@ input[type=submit] {
       <option value="{{x}}">{{x}}</option>
 
     {% endfor %}
+    
   
 </select>
 	 <input type="hidden" id="TaskBoard_uid" name="TaskBoard_uid" value="{{TaskBoard_uid}}">
@@ -58,8 +82,10 @@ input[type=submit] {
 	<input type="hidden" id="AddMember" name="AddMember" value="True">
 	<input type="submit" name="submit" id="submit" text="submit">
 	</form>
+  {% if size == 0 %} 
+    <p style="color: RED;"> seems like there no more memebrs in system who can be added</p>
+    {% endif %}
 	<div>
 </div>
-<a href="/">Click here to view Task</a>
 </body>
 </html>

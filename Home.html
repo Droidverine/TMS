@@ -23,22 +23,28 @@ input[type=text], select, textarea {
 }
 
 input[type=submit] {
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   padding: 12px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.8);
 
+}
 
 .container {
   border-radius: 5px;
   background-color: #f2f2f2;
   margin: auto;
   padding: 12px 20px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.8);
 
   width: 50%;
+}
+li{
+  display: inline-block;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -94,13 +100,14 @@ input[type=submit] {
 <ul class="list-group">
 {%for i in result%}
 
-<li class="list-group-item"><font size=+2><a href="\AddTask?ViewTask=true&TaskBoard_uid={{i.TaskBoard_uid}}&Task_boardname={{i.TaskBoard_name}}">Name : {{i.TaskBoard_name}}</a></font></br>
+<li class="list-group-item" onclick="location.href='/AddTask?ViewTask=true&TaskBoard_uid={{i.TaskBoard_uid}}&Task_boardname={{i.TaskBoard_name}}'"><font size=+2><a href="\AddTask?ViewTask=true&TaskBoard_uid={{i.TaskBoard_uid}}&Task_boardname={{i.TaskBoard_name}}">Name : {{i.TaskBoard_name}}</a></font></br>
   <a>Owner: {{i.TaskBoard_Owner}}</a></br>
   <a>Members :
 {% for x in i.TaskBoard_members%}
    {{x}}
 {% endfor %}
 </a>
+
 </li>
 {% endfor %}
 </ul>
@@ -109,9 +116,9 @@ input[type=submit] {
   {% if user %}
 {% else %}
 {% endif %}
-<p>you can {{ url_string }} <a href='{{ url }}'>here</a></p>
-</div>
-</div>
+<footer>Signed in as <b>{{user}}</b></footer>
 
+</div>
+</div>
 </body>
 </html>
