@@ -106,6 +106,7 @@ class LoginPage(webapp2.RequestHandler):
             'welcome' : welcome,
             'myuser' : myuser,
             'result':result,
+            'img':'logo.png'
 
 
         }
@@ -117,7 +118,9 @@ class LoginPage(webapp2.RequestHandler):
             'welcome' : welcome,
             'myuser' : myuser,
             'result':result,
-            'usersinsystem':usersinsystem
+            'usersinsystem':usersinsystem,
+                        'img':'logo.png'
+
 
         } 
         self.response.write(template.render(template_values))
